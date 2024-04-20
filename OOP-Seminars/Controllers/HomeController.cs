@@ -14,13 +14,7 @@ namespace OOP_Seminars.Controllers
     {
         public ActionResult Index()
         {
-            return View();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
+            DecisionAlgorithm d = new DecisionAlgorithm();
             return View();
         }
 
@@ -55,21 +49,6 @@ namespace OOP_Seminars.Controllers
             ViewBag.Error = "Не получилось загрузить файл!";
             return View();
         }
-
-        //[HttpGet]
-        //public ActionResult UserSelect(ForestAreaModel model)
-        //{
-        //    return View();
-        //}
-        //[HttpPost]
-        //public ActionResult UserSelect(string algorithmSelect, string forestArraySelect)
-        //{
-        //    // Здесь вы можете выполнить логику, связанную с обработкой выбранных данных,
-        //    // например, сохранение в базе данных, обработка и др.
-
-        //    // После обработки данных перенаправляем пользователя на представление с результатами
-        //    return RedirectToAction("Result");
-        //}
 
         [HttpGet]
         public ActionResult Result()

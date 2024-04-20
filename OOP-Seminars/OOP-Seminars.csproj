@@ -133,6 +133,7 @@
     <Compile Include="Models\ForestAreaModel.cs" />
     <Compile Include="Models\Tree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShScripts\DecisionAlgorithm.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
