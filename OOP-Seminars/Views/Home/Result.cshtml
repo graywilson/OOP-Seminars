@@ -1,0 +1,96 @@
+﻿@model OOP_Seminars.Models.ForestAreaModel
+
+@{
+    ViewBag.Title = "Результат";
+}
+
+<h2>Результат (Алгоритм: @ViewBag.algorithmSelect Метод: @ViewBag.forestArraySelect)</h2>
+
+<style>
+    #map {
+        height: 85vh; /* 85% высоты экрана */
+    }
+</style>
+
+<div id="map" style="height: 85vh;"></div>
+<div id="coordinates"></div>
+
+@section scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+          integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+            integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+            crossorigin=""></script>
+
+    <script>
+        var map;
+        var polygon;
+        var trees;
+
+        function init() {
+            // Вычисляем центр участка
+            var vertexCoordinates = @Html.Raw(Json.Encode(Model.VertexCoordinates));
+            var center = calculateCenter(vertexCoordinates);
+
+            // Создаем карту и центрируем по центру участка
+            map = L.map('map').setView([center.lat, center.lng], 18);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Добавляем линию периметра
+            polygon = L.polygon(vertexCoordinates.map(function (vertex) {
+                return [vertex.Latitude, vertex.Longitude];
+            })).addTo(map);
+
+            // Добавляем обработчик события клика для каждой точки на периметре
+            polygon.on('click', function (e) {
+                alert("Координаты: " + e.latlng.lat + ", " + e.latlng.lng);
+            });
+
+            // Добавляем деревья
+            trees = @Html.Raw(Json.Encode(Model.Trees));
+            trees.forEach(function (tree) {
+                var treeMarker = L.circleMarker([tree.Latitude, tree.Longitude]).addTo(map);
+
+                // Добавляем обработчик события клика для каждого дерева
+                treeMarker.on('click', function (e) {
+                    alert("Координаты дерева: " + e.latlng.lat + ", " + e.latlng.lng);
+                });
+            });
+
+            // Добавляем обработчик события наведения курсора
+            map.on('mousemove', function (e) {
+                document.getElementById('coordinates').innerHTML = 'Координаты: ' + e.latlng.lat.toFixed(6) + ', ' + e.latlng.lng.toFixed(6);
+            });
+
+            // Добавляем обработчик события правого клика мыши
+            map.on('contextmenu', function (e) {
+                var coordinatesText = e.latlng.lat.toFixed(6) + ', ' + e.latlng.lng.toFixed(6);
+                navigator.clipboard.writeText(coordinatesText);
+                alert("Координаты скопированы в буфер обмена: " + coordinatesText);
+            });
+        }
+
+        // Функция для вычисления центра участка
+        function calculateCenter(vertexCoordinates) {
+            var totalLat = 0;
+            var totalLng = 0;
+
+            for (var i = 0; i < vertexCoordinates.length; i++) {
+                totalLat += vertexCoordinates[i].Latitude;
+                totalLng += vertexCoordinates[i].Longitude;
+            }
+
+            return {
+                lat: totalLat / vertexCoordinates.length,
+                lng: totalLng / vertexCoordinates.length
+            };
+        }
+
+        // Инициализируем карту после загрузки страницы
+        window.onload = init;
+    </script>
+}

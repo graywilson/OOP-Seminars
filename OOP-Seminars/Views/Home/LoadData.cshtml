@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Загрузка Данных";
+}
+
+<h2>Загрузка Данных</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.Error
+    </div>
+}
+
+@using (Html.BeginForm("LoadData", "Home", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-group" }))
+{
+    <div class="mb-3">
+        <label for="fileUpload" class="form-label">Выберите XML файл для загрузки:</label>
+        <input type="file" id="fileUpload" name="fileUpload" accept=".xml" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="algorithmSelect">Выберите алгоритм:</label>
+        <select id="algorithmSelect" name="algorithmSelect" class="form-control">
+            <option value="Algorithm1">Алгоритм1</option>
+            <option value="Algorithm2">Алгоритм2</option>
+            <option value="Algorithm3">Алгоритм3</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="forestArraySelect">Выберите лесной массив:</label>
+        <select id="forestArraySelect" name="forestArraySelect" class="form-control">
+            <option value="Forest1">Лесной массив 1</option>
+            <option value="Forest2">Лесной массив 2</option>
+            <option value="Forest3">Лесной массив 3</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Выполнить</button>
+}

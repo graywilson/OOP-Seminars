@@ -1,0 +1,24 @@
+﻿<h2>Результаты по Вашим данным</h2>
+
+@using (Html.BeginForm("UserSelect", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    <div class="form-group">
+        <label for="algorithmSelect">Выберите алгоритм:</label>
+        <select id="algorithmSelect" name="algorithmSelect" class="form-control">
+            <option value="Algorithm1">Алгоритм1</option>
+            <option value="Algorithm2">Алгоритм2</option>
+            <option value="Algorithm3">Алгоритм3</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="forestArraySelect">Выберите лесной массив:</label>
+        <select id="forestArraySelect" name="forestArraySelect" class="form-control">
+            <option value="Forest1">Лесной массив 1</option>
+            <option value="Forest2">Лесной массив 2</option>
+            <option value="Forest3">Лесной массив 3</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Отправить</button>
+}
