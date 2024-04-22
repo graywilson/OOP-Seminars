@@ -1,0 +1,66 @@
+﻿@model List<OOP_Seminars.Models.TreeData>
+
+@{
+    ViewBag.Title = "ResultExcel";
+}
+
+<h2>Результат загрузки данных из Excel</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>№ точки</th>
+            <th>Х,м</th>
+            <th>У,м</th>
+            <th>Порода дерева</th>
+            <th>Диаметр D, м</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var treeData in Model)
+        {
+            <tr>
+                <td>@treeData.PointNumber</td>
+                <td>@treeData.X</td>
+                <td>@treeData.Y</td>
+                <td>@treeData.TreeType</td>
+                <td>@treeData.Diameter</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div id="map" style="height: 85vh;"></div>
+
+@section scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+          integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+            integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+            crossorigin=""></script>
+
+    <script>
+        var map;
+        var trees;
+
+        function initMap() {
+            // Создаем карту и центрируем ее на координатах первого дерева
+            var firstTree = @Html.Raw(Json.Encode(Model.FirstOrDefault()));
+            map = L.map('map').setView([firstTree.Y, firstTree.X], 18);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Добавляем деревья на карту
+            trees = @Html.Raw(Json.Encode(Model));
+            trees.forEach(function (tree) {
+                L.circleMarker([tree.Y, tree.X]).addTo(map);
+            });
+        }
+
+        // Инициализируем карту после загрузки страницы
+        window.onload = initMap;
+    </script>
+}

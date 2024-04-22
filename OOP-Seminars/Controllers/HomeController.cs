@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
 using System.Xml.Serialization;
+using OfficeOpenXml;
 
 namespace OOP_Seminars.Controllers
 {
@@ -22,6 +23,66 @@ namespace OOP_Seminars.Controllers
         public ActionResult LoadData()
         {
             return View();
+        }
+        
+        [HttpGet]
+        public ActionResult LoadExel()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult LoadExcel(HttpPostedFileBase fileUpload, string algorithmSelect, string forestArraySelect)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Установка контекста лицензии
+
+            if (fileUpload != null && fileUpload.ContentLength > 0)
+            {
+                try
+                {
+                    // Использование ExcelPackage для чтения данных
+                    using (var package = new ExcelPackage(fileUpload.InputStream))
+                    {
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                        int rowCount = worksheet.Dimension.Rows;
+
+                        // Создание списка для хранения данных из Excel
+                        List<TreeData> treeDataList = new List<TreeData>();
+
+                        // Чтение данных из Excel и сохранение их в модель TreeData
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            double xCoordinate = Convert.ToDouble(worksheet.Cells[row, 2].Value);
+                            double yCoordinate = Convert.ToDouble(worksheet.Cells[row, 3].Value);
+
+                            // Проверка, что обе координаты не равны 0
+                            if (xCoordinate != 0 && yCoordinate != 0)
+                            {
+                                TreeData data = new TreeData
+                                {
+                                    PointNumber = worksheet.Cells[row, 1].Value?.ToString(),
+                                    X = xCoordinate/100000,
+                                    Y = yCoordinate/100000,
+                                    TreeType = worksheet.Cells[row, 4].Value?.ToString(),
+                                    Diameter = worksheet.Cells[row, 5].Value?.ToString()
+                                };
+                                treeDataList.Add(data);
+                            }
+                        }
+
+                        // Передача списка treeDataList в представление ResultExcel
+                        return View("ResultExcel", treeDataList);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Error = "Ошибка при обработке файла: " + ex.Message;
+                    return View("ErrorView");
+                }
+            }
+
+            ViewBag.Error = "Файл не был загружен";
+            return View("ErrorView");
         }
 
         [HttpPost]
@@ -72,6 +133,58 @@ namespace OOP_Seminars.Controllers
             }
 
             return View(forestAreaModel);
+        }
+
+        [HttpGet]
+        public ActionResult ResultExcel()
+        {
+            ViewBag.algorithmSelect = "Алгоритм1";
+            ViewBag.forestArraySelect = "Метод1";
+            var filePath = Server.MapPath("~/exp.xlsx"); // Получаем путь к файлу на сервере
+
+            try
+            {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Установка контекста лицензии
+
+                // Использование ExcelPackage для чтения данных
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                    int rowCount = worksheet.Dimension.Rows;
+
+                    // Создание списка для хранения данных из Excel
+                    List<TreeData> treeDataList = new List<TreeData>();
+
+                    // Чтение данных из Excel и сохранение их в модель TreeData
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        double xCoordinate = Convert.ToDouble(worksheet.Cells[row, 2].Value);
+                        double yCoordinate = Convert.ToDouble(worksheet.Cells[row, 3].Value);
+
+                        // Проверка, что обе координаты не равны 0
+                        if (xCoordinate != 0 && yCoordinate != 0)
+                        {
+                            TreeData data = new TreeData
+                            {
+                                PointNumber = worksheet.Cells[row, 1].Value?.ToString(),
+                                X = xCoordinate / 100000,
+                                Y = yCoordinate / 100000,
+                                TreeType = worksheet.Cells[row, 4].Value?.ToString(),
+                                Diameter = worksheet.Cells[row, 5].Value?.ToString()
+                            };
+                            treeDataList.Add(data);
+                        }
+                    }
+
+                    // Передача списка treeDataList в представление ResultExcel
+                    return View("ResultExcel", treeDataList);
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Ошибка при обработке файла: " + ex.Message;
+                return View("ErrorView");
+            }
         }
     }
 }

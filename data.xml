@@ -56,12 +56,6 @@
             <Species>Willow</Species>
         </Tree>
         <Tree>
-            <Latitude>51.24000</Latitude>
-            <Longitude>6.66000</Longitude>
-            <Diameter>0.7</Diameter>
-            <Species>Cherry</Species>
-        </Tree>
-        <Tree>
             <Latitude>51.23000</Latitude>
             <Longitude>6.62000</Longitude>
             <Diameter>0.8</Diameter>
