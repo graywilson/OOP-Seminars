@@ -105,5 +105,11 @@
             <Diameter>0.6</Diameter>
             <Species>Oak</Species>
         </Tree>
+		<Tree>
+            <Latitude>61.786086</Latitude>
+			<Longitude>34.351754</Longitude>
+            <Diameter>2x0.6</Diameter>
+            <Species>Oak</Species>
+        </Tree>
     </Trees>
 </ForestArea>

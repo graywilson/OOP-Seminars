@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.UI.WebControls;
 using System.Xml.Serialization;
 using OfficeOpenXml;
+using System.Text.RegularExpressions;
 
 namespace OOP_Seminars.Controllers
 {
@@ -90,6 +91,7 @@ namespace OOP_Seminars.Controllers
         {
             ViewBag.algorithmSelect = algorithmSelect;
             ViewBag.forestArraySelect = forestArraySelect;
+
             if (fileUpload != null && fileUpload.ContentLength > 0)
             {
                 // Чтение данных из загруженного XML-файла
@@ -100,6 +102,9 @@ namespace OOP_Seminars.Controllers
                     forestAreaModel = (ForestAreaModel)serializer.Deserialize(stream);
                 }
 
+                // Добавляем проверку на вещественный диаметр и исключаем деревья с неверными данными
+                forestAreaModel.Trees.RemoveAll(tree => !IsValidDiameter(tree.Diameter));
+
                 // Здесь можно добавить дополнительную обработку данных, например, сохранение их в базе данных
 
                 // Перенаправляем пользователя на страницу выбора
@@ -109,6 +114,15 @@ namespace OOP_Seminars.Controllers
             // Если файл не был загружен, пишем об ошибке
             ViewBag.Error = "Не получилось загрузить файл!";
             return View();
+        }
+
+        private bool IsValidDiameter(string diameterStr)
+        {
+            // Регулярное выражение для числового значения с десятичной точкой
+            string pattern = @"^\d+(\.\d+)?$";
+
+            // Проверяем, соответствует ли строка регулярному выражению
+            return Regex.IsMatch(diameterStr, pattern);
         }
 
         [HttpGet]

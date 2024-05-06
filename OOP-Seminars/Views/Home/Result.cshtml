@@ -1,18 +1,38 @@
 ﻿@model OOP_Seminars.Models.ForestAreaModel
 
-@{    ViewBag.Title = "Результат";
+@{
+    ViewBag.Title = "Результат";
 }
 
 <h2>Результат (Алгоритм: @ViewBag.algorithmSelect Метод: @ViewBag.forestArraySelect)</h2>
 
 <style>
     #map {
-        height: 85vh; /* 85% высоты экрана */
+        height: 50vh; /* уменьшил высоту карты для места полей ввода */
+    }
+
+    .input-container {
+        margin-top: 20px;
+    }
+
+        .input-container input {
+            margin-right: 10px;
+        }
+
+    #treesList {
+        margin-top: 20px;
     }
 </style>
 
-<div id="map" style="height: 85vh;"></div>
+<div id="map"></div>
 <div id="coordinates"></div>
+
+<div class="input-container">
+    <input type="number" id="treesToRemove" placeholder="Введите количество деревьев для удаления" />
+    <button onclick="removeTrees()">Удалить</button>
+</div>
+
+<div id="treesList"></div>
 
 @section scripts {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
@@ -53,6 +73,7 @@
             trees = @Html.Raw(Json.Encode(Model.Trees));
             trees.forEach(function (tree) {
                 var treeMarker = L.circleMarker([tree.Latitude, tree.Longitude]).addTo(map);
+                tree.marker = treeMarker; // Сохраняем ссылку на маркер в объекте дерева
 
                 // Добавляем обработчик события клика для каждого дерева
                 treeMarker.on('click', function (e) {
@@ -87,6 +108,44 @@
                 lat: totalLat / vertexCoordinates.length,
                 lng: totalLng / vertexCoordinates.length
             };
+        }
+
+        function removeTrees() {
+            var treesToRemove = parseInt(document.getElementById('treesToRemove').value);
+            var removedTrees = []; // Массив для хранения удаленных деревьев
+            if (!isNaN(treesToRemove) && treesToRemove > 0) {
+                if (treesToRemove >= trees.length) {
+                    // Если запрошенное количество деревьев больше или равно оставшемуся, удаляем все оставшиеся деревья
+                    trees.forEach(function (tree) {
+                        var treeMarker = tree.marker; // Получаем маркер из объекта дерева
+                        map.removeLayer(treeMarker); // Удаляем маркер дерева с карты
+                        removedTrees.push(tree); // Добавляем удаленное дерево в массив
+                    });
+                    trees = []; // Очищаем массив деревьев
+                } else {
+                    // Иначе удаляем запрошенное количество деревьев
+                    for (var i = 0; i < treesToRemove; i++) {
+                        var randomIndex = Math.floor(Math.random() * trees.length);
+                        var tree = trees.splice(randomIndex, 1)[0]; // Удаляем данные о дереве из массива и сохраняем его
+                        var treeMarker = tree.marker; // Получаем маркер из объекта дерева
+                        map.removeLayer(treeMarker); // Удаляем маркер дерева с карты
+                        removedTrees.push(tree); // Добавляем удаленное дерево в массив
+                    }
+                }
+                updateTreesList(removedTrees); // Обновляем список удаленных деревьев
+            } else {
+                alert("Пожалуйста, введите корректное число деревьев для удаления.");
+            }
+        }
+
+
+        function updateTreesList(removedTrees) {
+            var treesListDiv = document.getElementById('treesList');
+            treesListDiv.innerHTML = '<h3>Удаленные деревья:</h3><ul>';
+            removedTrees.forEach(function (tree) {
+                treesListDiv.innerHTML += '<li>Координаты: ' + tree.marker.getLatLng().lat.toFixed(6) + ', ' + tree.marker.getLatLng().lng.toFixed(6) + '</li>';
+            });
+            treesListDiv.innerHTML += '</ul>';
         }
 
         // Инициализируем карту после загрузки страницы

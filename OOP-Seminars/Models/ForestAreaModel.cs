@@ -34,7 +34,7 @@ namespace OOP_Seminars.Models
         public double Longitude { get; set; }
 
         [XmlElement("Diameter")]
-        public double Diameter { get; set; }
+        public string Diameter { get; set; }
 
         [XmlElement("Species")]
         public string Species { get; set; }
